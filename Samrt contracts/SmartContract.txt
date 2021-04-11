@@ -1,0 +1,66 @@
+
+pragma solidity ^0.5.12;
+
+contract SmartContract {
+//Address of Resource Owner:
+address Owner_add=0x14723A09ACff6D2A60DcdF7aA4AFf308FDDC160C;
+//Address of the Resource Server:
+address RS_add=0x32Be343B94f860124dC4fEe278FDCBD38C102D88;
+//Adresses of the Clients:
+     address Class_1= 0xCA35b7d915458EF540aDe6068dFe2F44E8fa733c;
+     address Class_2= 0x32Be343B94f860124dC4fEe278FDCBD38C102D88;
+     address Class_3= 0x32Be343B94f860124dC4fEe278FDCBD38C102D88;
+//Modifiers in used to allow Owner to change the Smart Contract:
+modifier onlyOwner {
+        require(
+            msg.sender == Owner_add,
+            "Only owner can call this function.");
+        _;
+    }
+//1-Authentication:
+//Passwords
+bytes32 pass1= keccak256 (bytes ("Pass1"));
+bytes32 pass2=keccak256 (bytes ("Pass2"));
+bytes32 pass3=keccak256(bytes ("Pass3"));
+
+mapping (address=> bytes32) private Authentication;
+// Initialize an Authentication Table that maps the addresses with the hash functions
+
+function Init_Auth () public onlyOwner {  
+Authentication[Class_1]= pass1;
+Authentication[Class_2]= pass2;
+Authentication[Class_3]= pass3;
+}
+
+//Creat an Access Control Table:
+
+mapping (address=> uint) public Access_Control;
+
+function Init_Access_Control () public onlyOwner {  
+Access_Control[Class_1]=1;
+Access_Control[Class_2]=2;
+Access_Control[Class_3]=3;
+}
+////////////////////////////////////////////////////////////
+struct Token {
+       address _RS_add;
+        address Client_add;
+        uint Sf;
+    }
+ 
+mapping (address=> Token) public UsersToken;
+
+function AddToken(string memory pass_client) public returns(string memory){
+if (Authentication[msg.sender]==keccak256(bytes (pass_client)))
+{
+    UsersToken[msg.sender]._RS_add= RS_add;
+    UsersToken[msg.sender].Client_add= msg.sender;
+    UsersToken[msg.sender].Sf= Access_Control[msg.sender];
+   
+return ("Token has been issued to Client");
+}
+   else
+   { return ("Authentication Failed");}
+
+}
+}
